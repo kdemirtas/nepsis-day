@@ -9,11 +9,14 @@ The public face of Nepsis (the recovery companion app, private repo `kdemirtas/n
     PROJECT.md         spec
     ARCHITECTURE.md    shape of the work, proof strategy
     CLAUDE.md          working rules
+    content/           byte-identical copies and MANIFEST.md (origin commit, rendering pages)
+    scripts/check.py   the proof; tests/ its test
     docs/              longer reference docs the spec links
     sources/           reference material, catalogued in `sources/SOURCES.md`
 
 ## How to preview and deploy
 
     python3 -m http.server 8080        # from the repo root, then http://localhost:8080/
-    python3 scripts/check.py           # planned: the proof (parse, diff copied text, no <script>)
+    python3 scripts/check.py           # the proof: pages parse, no <script>, copies match content/MANIFEST.md, twins resolve
+    python3 -m unittest discover tests # the proof's own test: every fault it must catch, planted and caught
     GH_TOKEN=$(gh auth token --user kdemirtas) git push   # Cloudflare Pages deploys main, no build step

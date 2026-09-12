@@ -34,17 +34,18 @@ code. Type `webpage`.
 - **Numbers travel together.** A change that moves a quoted figure restates it everywhere it is
   quoted in the same PR.
 - **No JavaScript on the pages.** A reader with scripts blocked, on a bad connection, at 3am, gets every word. A feature that needs a script goes in `BACKLOG.md` with the reason.
-- **Copied texts are never edited here.** The withdrawal text and the privacy policy change in `kdemirtas/nepsis` first; this repo copies and records the commit.
+- **Copied texts are never edited here.** The withdrawal text and the privacy policy change in `kdemirtas/nepsis` first; this repo copies the file byte for byte and records repo, commit, path and the rendering pages in `content/MANIFEST.md`, never in a header (D-2026-09-12-12). The only text authored here is `content/emergency-numbers.json`, one cited source per row (D-2026-09-12-9).
+- **`scripts/check.py` is the proof.** Every PR runs it and says so; a hand diff is not a proof (D-2026-09-12-7). A new check comes with its fault in `tests/test_check.py`.
 - **Every user-facing string exists in English and Turkish, or the Turkish is a ⏳ row in `STATUS.md`.** Never invent Turkish; Kerem reviews all of it. Turkish needs ğüşıöç.
 - **Never judging, never blunt, never medical beyond "get help, here is the number".** The app's never-say list (`nepsis` `DESIGN.md`) applies word for word. "Suggests", never "predict".
 - **No 12-step content, no AA quotations** (AAWS copyright).
-- **Plain HTML and CSS only.** No generator, no framework, no npm. The stylesheet is the only shared file; a page reads on its own.
+- **Plain HTML and CSS only.** No generator, no framework, no npm. The stylesheet is the only shared file; a page reads on its own. Every element is closed explicitly, optional end tags included (D-2026-09-12-14).
 - **Push as kdemirtas.** `GH_TOKEN=$(gh auth token --user kdemirtas)` on every push, pull and `gh` call; plain `git push` fails with "Repository not found" on this account.
 - Descriptive snake_case names, no one-letter or cryptic names in anything Kerem reads.
 - No em-dashes in anything written here. Colon, comma, parentheses, or split the sentence.
 
 ## Environment
-- No toolchain. A browser and a text editor. `python3` (stdlib) for `scripts/check.py` when it exists.
+- No toolchain. A browser and a text editor. `python3` (stdlib) for `scripts/check.py`.
 - Cloudflare: Kerem's account (2FA on), registrar for `nepsis.day` since 2026-09-06 (⏳ auto-renew and transfer lock to confirm), ⏳ a Pages project pointed at `kdemirtas/nepsis-day`, DNS `CNAME` onto it. No API token in this repo, ever.
 - GitHub: `kdemirtas/nepsis-day`, public, created 2026-09-12 (empty until the first `/putdown`).
 - Local preview: `python3 -m http.server 8080` from the repo root, then `http://localhost:8080/`.
