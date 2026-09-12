@@ -13,7 +13,7 @@ Doc set rendered by `/init-project` (type `generic`) on 2026-09-12, in the same 
 4. ⏳ Kerem: Cloudflare Pages project on the repo, `nepsis.day` DNS onto it, confirm auto-renew and transfer lock.
 5. Phase 2: `withdrawal.html` from the app's JSON; Kerem reviews.
 6. ⏳ Kerem: the structure session (what else the site carries), the email-list provider.
-7. ⏳ One line for `web/` in `~/code/personal/CLAUDE.md` Project types.
+7. ✅ `web/` listed in `~/code/personal/CLAUDE.md` Project types and `~/code/personal/web/CLAUDE.md` written (2026-09-12).
 
 ## Infra
 - Hosting: Cloudflare Pages, ⏳ project to create on `kdemirtas/nepsis-day`, branch `main`, no build command, output `/`. Kerem's Cloudflare account, 2FA on.

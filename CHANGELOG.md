@@ -4,4 +4,5 @@
 > until a version is cut.
 
 ## Unreleased
+- PR #2: Docs: the web/ type folder is registered at the personal root (2026-09-12)
 - PR #1: Init: doc set for the nepsis.day site (2026-09-12)

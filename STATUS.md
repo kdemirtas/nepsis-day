@@ -3,7 +3,9 @@
 > older than the current wave are in `STATUS_ARCHIVE.md`. Last updated **2026-09-12**.
 > **Current wave:** init (since 2026-09-12)
 
-> **REPO CREATED, DOCS SHIPPED (2026-09-12). Staged.** `git init` on `main`, `kdemirtas/nepsis-day` created public and empty, this PR is the first commit (the eleven docs). Same session: the app's `sources/origin-night-lessons.md` was distilled and feeds `/withdrawal` (items 3, 7, 8). Still ⏳: Cloudflare Pages project and DNS, the email-list provider, Kerem's structure session, the `web/` line in `~/code/personal/CLAUDE.md`. Next: `/architect`.
+> **TYPE FOLDER REGISTERED (2026-09-12, evening). Shipped.** `web/` added to `~/code/personal/CLAUDE.md` Project types and `~/code/personal/web/CLAUDE.md` written (folder template, doc set, conventions: plain HTML and CSS, no scripts needed to read, no server code, public repo, EN and TR, kdemirtas push prefix). Neither file is in a repo (`~/code/personal` is not one). No HTML yet; RESUME unchanged.
+
+> **REPO CREATED, DOCS SHIPPED (2026-09-12). Staged.** `git init` on `main`, `kdemirtas/nepsis-day` created public and empty, this PR is the first commit (the eleven docs). Same session: the app's `sources/origin-night-lessons.md` was distilled and feeds `/withdrawal` (items 3, 7, 8). Still ⏳: Cloudflare Pages project and DNS, the email-list provider, Kerem's structure session. Next: `/architect`.
 
 > **PROJECT INITIALISED (2026-09-12). Staged.** Doc set created via `/init-project` (type
 > `generic`); scope agreed with Kerem. ⏳ the GitHub repo, ⏳ the Cloudflare Pages project and DNS, ⏳ the email-list provider, ⏳ Kerem's structure session.
