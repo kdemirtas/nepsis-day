@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "reviewedBy": null,
+  "sources": [
+    {
+      "name": "NICE CG100: Alcohol-use disorders: diagnosis and management of physical complications, Recommendations",
+      "url": "https://www.nice.org.uk/guidance/cg100/chapter/Recommendations"
+    },
+    {
+      "name": "NHS: Treating alcohol misuse",
+      "url": "https://www.nhs.uk/conditions/alcohol-misuse/treatment/"
+    },
+    {
+      "name": "NIAAA, Alcohol Health & Research World 1998;22(1):5-12: Saitz, Introduction to Alcohol Withdrawal",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6761824/"
+    },
+    {
+      "name": "NIAAA, Alcohol Health & Research World 1998;22(1):38-43: Myrick and Anton, Treatment of Alcohol Withdrawal",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6761817/"
+    },
+    {
+      "name": "SAMHSA TIP 45: Detoxification and Substance Abuse Treatment, HHS Publication No. (SMA) 15-4131",
+      "url": "https://www.govinfo.gov/content/pkg/GOVPUB-HE20_400-PURL-gpo124442/pdf/GOVPUB-HE20_400-PURL-gpo124442.pdf"
+    },
+    {
+      "name": "SAMHSA Quick Guide for Clinicians Based on TIP 45",
+      "url": "https://nida.nih.gov/sites/default/files/samhsa_detoxification_and_substance_abuse_treatment.pdf"
+    }
+  ],
+  "timeline": [
+    {
+      "fromHours": 6,
+      "toHours": 12,
+      "title": "Early symptoms begin",
+      "symptoms": [
+        "Anxiety",
+        "Trouble sleeping",
+        "Nausea and vomiting",
+        "Racing heartbeat, sweating and shaking (tremor)",
+        "Restlessness and irritability"
+      ]
+    },
+    {
+      "fromHours": 12,
+      "toHours": 24,
+      "title": "Symptoms intensify, seizure risk climbs",
+      "symptoms": [
+        "Agitation and poor concentration",
+        "Intense dreaming or nightmares",
+        "Increased sensitivity to sound, light and touch",
+        "Impaired memory and judgment",
+        "Rising seizure risk, peaking near the 24 hour mark"
+      ]
+    },
+    {
+      "fromHours": 24,
+      "toHours": 48,
+      "title": "Highest seizure risk, hallucinations may start",
+      "symptoms": [
+        "Most alcohol withdrawal seizures happen in this window",
+        "Seeing, hearing or feeling things that are not there",
+        "Fast heartbeat and high blood pressure",
+        "Fever"
+      ]
+    },
+    {
+      "fromHours": 48,
+      "toHours": 72,
+      "title": "Delirium tremens can begin",
+      "symptoms": [
+        "Confusion and disorientation about time, place or person",
+        "Severe agitation",
+        "Persistent hallucinations",
+        "Sharp rises in heart rate, breathing rate and blood pressure",
+        "High fever"
+      ]
+    },
+    {
+      "fromHours": 72,
+      "toHours": 168,
+      "title": "Delirium tremens can continue; most symptoms fade",
+      "symptoms": [
+        "Delirium tremens, once present, usually continues for several more days and is a medical emergency",
+        "Most other withdrawal symptoms ease over the following days",
+        "Sleep problems and anxiety can persist for weeks in heavy drinkers"
+      ]
+    }
+  ],
+  "erNow": [
+    "A seizure, or convulsions of any kind",
+    "Confusion: not knowing what day it is, or not recognising where you are",
+    "Seeing, hearing, or feeling things that are not there",
+    "Shaking that cannot be controlled",
+    "Unusual restlessness, irritability, or agitation that will not settle",
+    "A heartbeat that is very fast or irregular, or blood pressure that spikes or drops sharply",
+    "A fever above 38°C (100.4°F)",
+    "Abdominal pain, or vomiting or passing blood"
+  ],
+  "highRisk": "You are at higher risk of severe withdrawal, including seizures and delirium tremens, if you have had a withdrawal seizure or delirium tremens before, if you have been hospitalised for withdrawal more than once, or if you have liver disease or a liver transplant. Tell emergency staff this history.",
+  "closing": "Alcohol withdrawal can be treated. Treatment is safe. Call now."
+}

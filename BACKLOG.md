@@ -11,5 +11,5 @@ at `/pickup`, which lists the entries whose trigger is now true.
 | 2 | a page for clinicians (what the app records, what it never does, the medical card format) | a psychiatrist or transplant team asked what the app is | Phase 5 of the app (a clinician on board) | 2026-09-12 |
 | 3 | a store badge and screenshots on `/` | the listing exists | the app's first Play upload (P10) | 2026-09-12 |
 | 4 | self-hosted Manrope and Nunito | the system stack looks off on some phones | Kerem sees it and says so; 200 KB budget | 2026-09-12 |
-| 5 | `scripts/check.py`, the automated proof | hand diffs of copied text will drift | the second content update to any page | 2026-09-12 |
+| 5 | ~~`scripts/check.py`, the automated proof~~ promoted to Phase 1 by D-2026-09-12-7 on 2026-09-12 | hand diffs of copied text will drift | closed | 2026-09-12 |
 | 6 | a redirect from `nepsis.dev` if Kerem registers it | he remembered `.dev` as the domain on 2026-09-12 | Kerem registers it | 2026-09-12 |
