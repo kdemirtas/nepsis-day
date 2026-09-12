@@ -4,4 +4,4 @@
 > until a version is cut.
 
 ## Unreleased
-- 2026-09-12: project initialised (`/init-project`, type `generic`).
+- PR #1: Init: doc set for the nepsis.day site (2026-09-12)
