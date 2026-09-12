@@ -3,7 +3,7 @@
 the public static site for Nepsis at `nepsis.day`, English and Turkish, no accounts, no server, no health data
 
 Read `HANDOVER.md` first, then the top of `STATUS.md`, then `ARCHITECTURE.md` before touching
-code. Type `generic`.
+code. Type `webpage`.
 
 ## Doc set
 
