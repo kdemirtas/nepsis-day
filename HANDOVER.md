@@ -1,9 +1,9 @@
 # HANDOVER: nepsis.day
-Type: generic
+Type: webpage
 Resume point. Full detail in `STATUS.md` (top blockquote); shape of the code in `ARCHITECTURE.md`.
 
-## CURRENT: docs shipped, repo live, no HTML yet (2026-09-12)
-Doc set rendered by `/init-project` (type `generic`) on 2026-09-12, in the same session that distilled `nepsis` `sources/origin-night-lessons.md`. Kerem's calls today: generic type; own public repo at `~/code/personal/web/nepsis-day/`; hand-written HTML and CSS, no build step, no scripts; email list deferred. Structure beyond the three pages is his session, later. No HTML exists yet; no repo yet.
+## CURRENT: docs shipped, repo live, type `webpage`, no HTML yet (2026-09-12)
+Doc set rendered by `/init-project` (type `generic`, re-stamped `webpage` the same night once the type existed: `claude-shared` PR #6, D-2026-09-12-6) on 2026-09-12, in the same session that distilled `nepsis` `sources/origin-night-lessons.md`. Kerem's calls today: generic type; own public repo at `~/code/personal/web/nepsis-day/`; hand-written HTML and CSS, no build step, no scripts; email list deferred. Structure beyond the three pages is his session, later. No HTML exists yet; no repo yet.
 **RESUME:** run `/architect` (greenfield) in `~/code/personal/web/nepsis-day/`: confirm the `content/` and `scripts/check.py` boundaries and the copied-text contracts, then Phase 1 (`style.css`, `index.html`, `privacy.html`, `404.html`).
 
 ## NEXT STEPS (pick up here)
@@ -14,6 +14,7 @@ Doc set rendered by `/init-project` (type `generic`) on 2026-09-12, in the same 
 5. Phase 2: `withdrawal.html` from the app's JSON; Kerem reviews.
 6. ⏳ Kerem: the structure session (what else the site carries), the email-list provider.
 7. ✅ `web/` listed in `~/code/personal/CLAUDE.md` Project types and `~/code/personal/web/CLAUDE.md` written (2026-09-12).
+8. ✅ `webpage` type in `/init-project`; this repo stamped with it (2026-09-12).
 
 ## Infra
 - Hosting: Cloudflare Pages, ⏳ project to create on `kdemirtas/nepsis-day`, branch `main`, no build command, output `/`. Kerem's Cloudflare account, 2FA on.

@@ -5,6 +5,7 @@
 
 | Id | Decided | What | Replaces |
 |---|---|---|---|
+| D-2026-09-12-6 | 2026-09-12 | Type `webpage`: the site is the first project under the new init-project type | D-2026-09-12-2 |
 | D-2026-09-12-5 | 2026-09-12 | Email list deferred: no form until a provider is chosen | none |
 | D-2026-09-12-4 | 2026-09-12 | Hand-written HTML and CSS, no build step, no JavaScript needed to read | none |
 | D-2026-09-12-3 | 2026-09-12 | Own public repo `kdemirtas/nepsis-day` at `~/code/personal/web/nepsis-day/` | none |
@@ -16,6 +17,12 @@
 **Evidence.** `/init-project` run on 2026-09-12; scope agreed with Kerem in the init interview.
 **Replaces.** Nothing.
 **Cited by.** `HANDOVER.md` (the Type stamp).
+
+## D-2026-09-12-6: type `webpage`
+**What.** The `Type:` stamp becomes `webpage`, the static-site type added to `/init-project` on 2026-09-12 (`templates/web/`, `references/type-web.md`). The type encodes what this repo's docs already say: pages at the root, a language mirror, one `style.css`, `content/` with a `SOURCE:` commit per copied text, `scripts/check.py` as the proof, no scripts, no server. The existing docs are not re-rendered; they were the template's source.
+**Evidence.** Kerem's call, 2026-09-12 evening: `/init-project webpage` in this repo, "add a webpage type to the skill, then re-stamp nepsis-day". `/pickup`, `/putdown` and `/architect` read the new stamp.
+**Replaces.** D-2026-09-12-2 (type `generic`, chosen because no closer type existed).
+**Cited by.** `HANDOVER.md` (the Type stamp), `CLAUDE.md`.
 
 ## D-2026-09-12-5: email list deferred
 **What.** No sign-up form on the first cut; ⏳ the provider is undecided. Buttondown was the candidate; a Cloudflare Worker was rejected because a Worker is a server.

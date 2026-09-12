@@ -3,6 +3,8 @@
 > older than the current wave are in `STATUS_ARCHIVE.md`. Last updated **2026-09-12**.
 > **Current wave:** init (since 2026-09-12)
 
+> **RE-STAMPED `webpage` (2026-09-12, night). Staged.** `/init-project webpage` here revealed no such type; Kerem's call: add it to the shared skill, then re-stamp this repo. `kdemirtas/claude-shared` PR #6 (merged) adds `templates/web/` (layout, rules, proof, infra fragments, `README.md`, dirs `assets/ content/ scripts/ docs/ sources/`), `references/type-web.md`, `render.py --type web`, and teaches `/pickup`, `/putdown`, `/architect` the stamp. This repo: `HANDOVER.md` and `CLAUDE.md` say `Type: webpage`, `DECISIONS.md` D-2026-09-12-6 replaces the `generic` choice; docs not re-rendered (they were the template's source). `~/code/personal/web/CLAUDE.md` Doc set points at the type (not in a repo). No HTML yet; RESUME unchanged.
+
 > **TYPE FOLDER REGISTERED (2026-09-12, evening). Shipped.** `web/` added to `~/code/personal/CLAUDE.md` Project types and `~/code/personal/web/CLAUDE.md` written (folder template, doc set, conventions: plain HTML and CSS, no scripts needed to read, no server code, public repo, EN and TR, kdemirtas push prefix). Neither file is in a repo (`~/code/personal` is not one). No HTML yet; RESUME unchanged.
 
 > **REPO CREATED, DOCS SHIPPED (2026-09-12). Staged.** `git init` on `main`, `kdemirtas/nepsis-day` created public and empty, this PR is the first commit (the eleven docs). Same session: the app's `sources/origin-night-lessons.md` was distilled and feeds `/withdrawal` (items 3, 7, 8). Still ⏳: Cloudflare Pages project and DNS, the email-list provider, Kerem's structure session. Next: `/architect`.
@@ -35,7 +37,7 @@ Docs only; no HTML written yet. The site is four pages in two languages, hand-wr
 4. ⏳ Kerem: Cloudflare Pages project on the repo, `nepsis.day` DNS onto it, confirm auto-renew and transfer lock.
 5. Phase 2: `withdrawal.html` from the app's JSON; Kerem reviews.
 6. ⏳ Kerem: the structure session (what else the site carries), the email-list provider.
-7. ⏳ One line for `web/` in `~/code/personal/CLAUDE.md` Project types.
+7. ✅ One line for `web/` in `~/code/personal/CLAUDE.md` Project types; ✅ `webpage` type in `/init-project`, this repo stamped with it.
 
 ## How to run
     cd ~/code/personal/web/nepsis-day
