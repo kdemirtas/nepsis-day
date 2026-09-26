@@ -4,6 +4,7 @@
 > until a version is cut.
 
 ## Unreleased
+- PR #7: nepsis-day: live on Cloudflare Pages; email obfuscation on the zone to switch off (2026-09-26)
 - PR #6: Phase 1b: style.css and the English pages /, /privacy and 404 (D-2026-09-26-2) (2026-09-26, closes N1)
 - PR #5: Phase 1a residue: check.py holds inline style blocks and hidden country blocks to the rules, reads CSS as CSS (D-2026-09-26-1) (2026-09-26, closes N4)
 - PR #4: Phase 1a: the check script, its test, the first copies and the manifest; architect decisions D-2026-09-12-7 to -20 (2026-09-12)
