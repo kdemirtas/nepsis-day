@@ -11,7 +11,9 @@ Checks, in the order they print:
   copies     every string of a copied text occurs in each page its manifest row names
   numbers    every row of emergency-numbers.json has a source and, on each rendering page, a
              country block whose only number is that row's, with one suggestion note and one pick
-             link; the rules doc and the stylesheet carry their side (D-2026-09-12-11)
+             link; the rules doc and the stylesheet carry their side (D-2026-09-12-11); no
+             country block is hidden by an attribute, a <template> or a rule, and a page's <style>
+             blocks are held to the stylesheet's rules (D-2026-09-26-1)
 A check whose subject does not exist yet prints SKIP. `python3 -m unittest discover tests` plants
 every fault this file must catch.
 """
@@ -41,7 +43,10 @@ SCRIPT_SCHEMES = ("javascript:", "vbscript:", "data:text/html")
 FULL_COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SEPARATOR_CELL_PATTERN = re.compile(r"^:?-+:?$")
 META_REFRESH_PATTERN = re.compile(r"^\s*\d+\s*;\s*url\s*=\s*['\"]?([^'\"\s]+)", re.I)
-CSS_COMMENT_PATTERN = re.compile(r"/\*.*?\*/", re.S)
+CSS_STRING_PATTERN = re.compile(r"\"((?:\\.|[^\"\\\n])*)\"|'((?:\\.|[^'\\\n])*)'", re.S)
+CSS_ESCAPE_PATTERN = re.compile(r"\\(?:([0-9a-fA-F]{1,6})[ \t\n\r\f]?|(.))", re.S)
+CSS_IMPORTANT_PATTERN = re.compile(r"!\s*important\s*$", re.I)
+HIDING_VALUES = {"display": {"none"}, "visibility": {"hidden", "collapse"}}
 VOID_TAGS = {
     "area",
     "base",
@@ -111,6 +116,7 @@ class Block:
     link_targets: list[str] = field(default_factory=list)
     attribute_values: list[str] = field(default_factory=list)
     note_count: int = 0
+    hidden_by: str = ""
 
     @property
     def text(self) -> str:
@@ -137,6 +143,7 @@ class Page:
     hreflang_targets: dict[str, str] = field(default_factory=dict)
     blocks: dict[str, Block] = field(default_factory=dict)
     duplicate_ids: list[str] = field(default_factory=list)
+    style_blocks: list[str] = field(default_factory=list)
     parse_error: str = ""
 
     def country_blocks(self) -> list[Block]:
@@ -184,19 +191,102 @@ class EmergencyNumber:
     checked_on: str
 
 
+@dataclass
+class CssRule:
+    """One rule of a stylesheet: its selector as written, its own declarations, and the preludes
+    of the at-rules and parent rules it is nested in, outermost first."""
+
+    selector: str
+    body: str = ""
+    enclosing: tuple[str, ...] = ()
+
+    @property
+    def is_top_level_style(self) -> bool:
+        """A style rule outside every at-rule and parent rule, the kind D-2026-09-12-16 reads."""
+        return not self.enclosing and not self.selector.startswith("@")
+
+    @property
+    def declarations(self) -> list[tuple[str, str]]:
+        """(property, value) in source order, property lowercased, `!important` dropped."""
+        pairs = []
+        for declaration in split_outside_strings(self.body, ";"):
+            name, separator, value = declaration.partition(":")
+            if separator:
+                pairs.append((name.strip().lower(), CSS_IMPORTANT_PATTERN.sub("", value).strip()))
+        return pairs
+
+    def last_value(self, property_name: str) -> str | None:
+        """The last value this rule gives the property, lowercased, or None.
+
+        Args:
+            property_name: a CSS property, lowercase.
+        """
+        values = [value for name, value in self.declarations if name == property_name]
+        return values[-1].lower() if values else None
+
+    def hides(self) -> bool:
+        """The element it matches is kept from every reader (D-2026-09-26-1)."""
+        return any(
+            self.last_value(property_name) in hiding
+            for property_name, hiding in HIDING_VALUES.items()
+        )
+
+    @property
+    def resolved_selector(self) -> str:
+        """The selector with its parent rules applied: `&` takes the parent, else a descendant."""
+        resolved = ""
+        for prelude in self.enclosing + (self.selector,):
+            if prelude.startswith("@"):
+                continue
+            if not resolved:
+                resolved = prelude
+            elif "&" in prelude:
+                resolved = prelude.replace("&", resolved)
+            else:
+                resolved = f"{resolved} {prelude}"
+        return re.sub(r"\s+", " ", resolved).strip()
+
+
+@dataclass
+class OpenElement:
+    tag: str
+    block: Block | None
+    hidden_by: str
+
+
 class PageParser(HTMLParser):
     def __init__(self, page: Page):
         super().__init__(convert_charrefs=True)
         self.page = page
         self.text_parts: list[str] = []
-        self.open_elements: list[tuple[str, Block | None]] = []
+        self.open_elements: list[OpenElement] = []
         self.inside_style = False
 
     def open_blocks(self) -> list[Block]:
-        return [block for _, block in self.open_elements if block is not None]
+        return [element.block for element in self.open_elements if element.block is not None]
 
     def open_tags(self) -> list[str]:
-        return [open_tag for open_tag, _ in self.open_elements]
+        return [element.tag for element in self.open_elements]
+
+    def hiding_reason(self, tag: str, attributes: dict[str, str]) -> str:
+        """Why this element or an open ancestor keeps its content from every reader, if it does.
+
+        Args:
+            tag: the element's tag name.
+            attributes: its attributes, names lowercased.
+        """
+        inherited = next(
+            (element.hidden_by for element in self.open_elements if element.hidden_by), ""
+        )
+        if inherited:
+            return inherited
+        if tag == "template":
+            return "inside <template>"
+        if "hidden" in attributes:
+            return f"hidden attribute on <{tag}>"
+        if CssRule("", attributes.get("style", "")).hides():
+            return f"style attribute on <{tag}>"
+        return ""
 
     def note_implied_close(self, tag: str) -> None:
         """D-2026-09-12-14: a tag a browser would close for us is a fault here."""
@@ -223,6 +313,7 @@ class PageParser(HTMLParser):
             )
         if tag == "style":
             self.inside_style = True
+            self.page.style_blocks.append("")
         if (
             tag == "link"
             and attributes.get("rel", "").lower() == "alternate"
@@ -233,7 +324,10 @@ class PageParser(HTMLParser):
         fetches = self.fetch_candidates(tag, attributes)
         self.note_scripts_in(attributes, fetches + [attributes.get("href", "")])
         self.page.foreign_fetches += [url for url in fetches if is_foreign(url)]
-        block = Block(attributes["id"], classes) if "id" in attributes else None
+        hidden_by = self.hiding_reason(tag, attributes)
+        block = None
+        if "id" in attributes:
+            block = Block(attributes["id"], classes, hidden_by=hidden_by)
         if block is not None and block.element_id in self.page.blocks:
             self.page.duplicate_ids.append(block.element_id)
             block = None
@@ -248,7 +342,7 @@ class PageParser(HTMLParser):
                 value for name, value in attributes.items() if name not in STRUCTURAL_ATTRIBUTES
             ]  # D-2026-09-12-13, D-2026-09-12-19, D-2026-09-12-20
         if tag not in VOID_TAGS:
-            self.open_elements.append((tag, block))
+            self.open_elements.append(OpenElement(tag, block, hidden_by))
 
     def note_scripts_in(self, attributes: dict[str, str], urls: list[str]) -> None:
         for name in attributes:
@@ -291,23 +385,25 @@ class PageParser(HTMLParser):
         if tag in VOID_TAGS:
             return
         for index in range(len(self.open_elements) - 1, -1, -1):
-            if self.open_elements[index][0] == tag:
-                for skipped, _ in self.open_elements[index + 1 :]:
-                    self.page.script_faults.append(f"unclosed <{skipped}> inside </{tag}>")
+            if self.open_elements[index].tag == tag:
+                for skipped in self.open_elements[index + 1 :]:
+                    self.page.script_faults.append(f"unclosed <{skipped.tag}> inside </{tag}>")
                 del self.open_elements[index:]
                 return
         self.page.script_faults.append(f"stray </{tag}>")
 
     def close(self) -> None:
         super().close()
-        for open_tag, _ in self.open_elements:
-            self.page.script_faults.append(f"unclosed <{open_tag}> at end of file")
+        for element in self.open_elements:
+            self.page.script_faults.append(f"unclosed <{element.tag}> at end of file")
+        for style_block in self.page.style_blocks:
+            urls = css_urls(strip_css_comments(style_block))
+            self.page.foreign_fetches += [url for url in urls if is_foreign(url)]
+            self.note_scripts_in({}, urls)
 
     def handle_data(self, data: str) -> None:
         if self.inside_style:
-            urls = css_urls(CSS_COMMENT_PATTERN.sub("", data))
-            self.page.foreign_fetches += [url for url in urls if is_foreign(url)]
-            self.note_scripts_in({}, urls)
+            self.page.style_blocks[-1] += data
             return
         self.text_parts.append(data)
         for block in self.open_blocks():
@@ -325,38 +421,261 @@ def css_urls(css_text: str) -> list[str]:
     ]
 
 
-def top_level_css_rules(css_text: str) -> list[tuple[str, str]]:
-    """(selector, body) for every rule at depth 0; at-rules and what nests in them are skipped."""
-    rules, depth, selector, body, quote = [], 0, "", "", ""
-    for character in css_text:
+def strip_css_comments(css_text: str) -> str:
+    """Comments removed; a `/*` inside a string or after a backslash is text, not a comment.
+
+    Args:
+        css_text: a stylesheet or the text of one `<style>` block.
+    """
+    kept, quote, index = [], "", 0
+    while index < len(css_text):
+        character = css_text[index]
+        if character == "\\":
+            kept.append(css_text[index : index + 2])
+            index += 2
+            continue
+        if not quote and css_text.startswith("/*", index):
+            end = css_text.find("*/", index + 2)
+            index = len(css_text) if end == -1 else end + 2
+            kept.append(" ")
+            continue
+        if quote and character in (quote, "\n"):
+            quote = ""
+        elif not quote and character in "'\"":
+            quote = character
+        kept.append(character)
+        index += 1
+    return "".join(kept)
+
+
+def split_outside_strings(text: str, separator: str) -> list[str]:
+    """`text` cut at `separator` wherever it stands outside a string, parentheses or an escape.
+
+    Args:
+        text: CSS declarations or a selector list.
+        separator: one character, `;` or `,`.
+    """
+    parts, current, quote, depth, index = [], "", "", 0, 0
+    while index < len(text):
+        character = text[index]
+        if character == "\\":
+            current += text[index : index + 2]
+            index += 2
+            continue
+        if quote:
+            if character in (quote, "\n"):
+                quote = ""
+        elif character in "'\"":
+            quote = character
+        elif character == "(":
+            depth += 1
+        elif character == ")":
+            depth = max(depth - 1, 0)
+        elif character == separator and depth == 0:
+            parts.append(current)
+            current = ""
+            index += 1
+            continue
+        current += character
+        index += 1
+    return parts + [current]
+
+
+def css_rules(css_text: str) -> list[CssRule]:
+    """Every rule at any depth, in source order; a `;` outside a style rule ends a statement such
+    as `@import` or `@charset`, so it never glues onto the selector after it.
+
+    Args:
+        css_text: a stylesheet or the text of one `<style>` block, comments included.
+    """
+    css_text = strip_css_comments(css_text)
+    rules: list[CssRule] = []
+    open_rules: list[CssRule] = []
+    current, quote, index = "", "", 0
+    while index < len(css_text):
+        character = css_text[index]
+        inside_style_rule = bool(open_rules) and not open_rules[-1].selector.startswith("@")
+        if character == "\\":
+            current += css_text[index : index + 2]
+            index += 2
+            continue
+        if quote:
+            if character in (quote, "\n"):
+                quote = ""
+            current += character
+        elif character in "'\"":
+            quote = character
+            current += character
+        elif character == ";":
+            if inside_style_rule:
+                open_rules[-1].body += current + ";"
+            current = ""
+        elif character == "{":
+            enclosing = tuple(open_rule.selector for open_rule in open_rules)
+            rule = CssRule(current.strip(), "", enclosing)
+            rules.append(rule)
+            open_rules.append(rule)
+            current = ""
+        elif character == "}":
+            if inside_style_rule:
+                open_rules[-1].body += current
+            if open_rules:
+                open_rules.pop()
+            current = ""
+        else:
+            current += character
+        index += 1
+    return rules
+
+
+def decode_css_escapes(text: str) -> str:
+    """`\\31 ` is `1`, `\\201C` is a left quote, `\\"` is a quote (CSS Syntax 4.3.7).
+
+    Args:
+        text: the inside of one CSS string, quotes removed.
+    """
+
+    def decoded(match: re.Match) -> str:
+        """One escape as the character it stands for.
+
+        Args:
+            match: a CSS_ESCAPE_PATTERN match, hex digits or one escaped character.
+        """
+        if match.group(1):
+            code_point = int(match.group(1), 16)
+            valid = 0 < code_point <= 0x10FFFF and not 0xD800 <= code_point <= 0xDFFF
+            return chr(code_point) if valid else "�"
+        return "" if match.group(2) == "\n" else match.group(2)
+
+    return CSS_ESCAPE_PATTERN.sub(decoded, text)
+
+
+def content_digit_runs(rules: list[CssRule]) -> list[str]:
+    """Every run of two or more digits a `content:` declaration writes, its strings joined and
+    decoded; the property only, never a selector such as `.content:hover` (D-2026-09-26-1).
+
+    Args:
+        rules: the rules to read, at any depth.
+    """
+    runs = []
+    for rule in rules:
+        for name, value in rule.declarations:
+            if name == "content":
+                written = "".join(
+                    decode_css_escapes(double or single)
+                    for double, single in CSS_STRING_PATTERN.findall(value)
+                )
+                runs += re.findall(r"\d{2,}", written)
+    return runs
+
+
+def subject_compound(selector: str) -> str:
+    """The last compound of one complex selector, the element the rule styles. A combinator
+    inside parentheses, brackets or a string does not split it. The arguments of `:not()` are
+    removed, so `.x:not(.country)` names no country; `:is()`, `:where()` and `:has()` keep
+    theirs, so `:is(.country)` and `main:has(.country)` do (D-2026-09-26-1).
+
+    Args:
+        selector: one complex selector, no commas outside parentheses.
+    """
+    depth, start, quote, index = 0, 0, "", 0
+    while index < len(selector):
+        character = selector[index]
+        if character == "\\":
+            index += 2
+            continue
         if quote:
             if character == quote:
                 quote = ""
         elif character in "'\"":
             quote = character
-        elif character == "{":
+        elif character in "([":
             depth += 1
-            if depth == 1:
-                body = ""
-                continue
-        elif character == "}":
+        elif character in ")]":
             depth = max(depth - 1, 0)
+        elif depth == 0 and (character.isspace() or character in ">+~"):
+            start = index + 1
+        index += 1
+    return without_not_arguments(selector[start:])
+
+
+def without_not_arguments(compound: str) -> str:
+    """`compound` with the parenthesised argument of every `:not(` removed, nesting included.
+
+    Args:
+        compound: one compound selector.
+    """
+    lowered = compound.lower()
+    opening = lowered.find(":not(")
+    if opening == -1:
+        return compound
+    depth, index = 0, opening + len(":not")
+    while index < len(compound):
+        if compound[index] == "(":
+            depth += 1
+        elif compound[index] == ")":
+            depth -= 1
             if depth == 0:
-                if not selector.strip().startswith("@"):
-                    rules.append((selector.strip(), body))
-                selector = ""
-                continue
-        if depth == 0:
-            selector += character
-        elif depth == 1:
-            body += character
-    return rules
+                break
+        index += 1
+    return compound[:opening] + without_not_arguments(compound[index + 1 :])
+
+
+def hides_country_block(rule: CssRule, countries: set[str]) -> bool:
+    """A rule that keeps a country block from some reader, `:target` or not (D-2026-09-26-1).
+
+    Args:
+        rule: one rule of a stylesheet or a `<style>` block.
+        countries: the uppercase codes of the numbers table, read as `#<CC>` ids.
+    """
+    if rule.selector.startswith("@") or not rule.hides():
+        return False
+    names = [rf"\.{COUNTRY_BLOCK_CLASS}"] + [rf"#{re.escape(code)}" for code in countries]
+    names_a_block = re.compile(rf"(?:{'|'.join(names)})(?![\w-])")
+    return any(
+        names_a_block.search(subject_compound(part.strip()))
+        for part in split_outside_strings(rule.resolved_selector, ",")
+    )
+
+
+def suggestion_rules_hold(rules: list[CssRule]) -> bool:
+    """The note is hidden and shown under `:target`, by the last top-level rules that say so
+    (D-2026-09-12-16).
+
+    Args:
+        rules: the rules in cascade order, `style.css` first, then any `<style>` blocks.
+    """
+    note_displays, target_displays = [], []
+    show_selectors = {
+        f".{COUNTRY_BLOCK_CLASS}:target .{SUGGESTION_NOTE_CLASS}",
+        f".{COUNTRY_BLOCK_CLASS}:target > .{SUGGESTION_NOTE_CLASS}",
+    }
+    for rule in rules:
+        if not rule.is_top_level_style:
+            continue
+        selectors = selector_list(rule.selector)
+        if f".{SUGGESTION_NOTE_CLASS}" in selectors:
+            note_displays.append(rule.last_value("display"))
+        if selectors & show_selectors:
+            target_displays.append(rule.last_value("display"))
+    hides = bool(note_displays) and note_displays[-1] == "none"
+    shows = bool(target_displays) and target_displays[-1] not in (None, "none")
+    return hides and shows
 
 
 def selector_list(selector: str) -> set[str]:
     return {
         re.sub(r"\s*>\s*", " > ", re.sub(r"\s+", " ", part.strip())) for part in selector.split(",")
     }
+
+
+def page_style_rules(page: Page) -> list[CssRule]:
+    """The rules of a page's <style> blocks, each block read on its own, in document order.
+
+    Args:
+        page: a parsed page.
+    """
+    return [rule for style_block in page.style_blocks for rule in css_rules(style_block)]
 
 
 def is_foreign(url: str) -> bool:
@@ -485,7 +804,7 @@ class Checker:
             self.report.result("pages", "PASS", "style.css: own origin only")
 
     def read_css(self) -> str:
-        return CSS_COMMENT_PATTERN.sub("", (self.root / "style.css").read_text(encoding="utf-8"))
+        return strip_css_comments((self.root / "style.css").read_text(encoding="utf-8"))
 
     def pending_in_status(self, name: str) -> bool:
         status_file = self.root / "STATUS.md"
@@ -720,7 +1039,12 @@ class Checker:
                 continue
             self.check_country_blocks(numbers, page)
         self.check_rules_doc(numbers)
-        self.check_stylesheet()
+        rendering_pages = [
+            self.pages[page_path]
+            for page_path in numbers_copy.row.rendered_in
+            if page_path in self.pages
+        ]
+        self.check_stylesheet(rendering_pages, {number.country for number in numbers})
 
     def check_country_blocks(self, numbers: list[EmergencyNumber], page: Page) -> None:
         """Number, note and pick link inside each block, text and attributes (D-2026-09-12-13)."""
@@ -746,6 +1070,10 @@ class Checker:
                     )
             if COUNTRY_BLOCK_CLASS not in block.own_classes:
                 problems.append(f"{number.country} block lacks class {COUNTRY_BLOCK_CLASS}")
+            if block.hidden_by:  # D-2026-09-26-1
+                problems.append(
+                    f"{number.country} block is hidden from every reader: {block.hidden_by}"
+                )
             if block.note_count != 1:
                 problems.append(
                     f"{number.country} block has {block.note_count} "
@@ -788,37 +1116,34 @@ class Checker:
         else:
             self.report.result("numbers", "PASS", "docs/cloudflare-rules.md targets every country")
 
-    def check_stylesheet(self) -> None:
-        """The hide and show rules at top level, grouped selectors accepted (D-2026-09-12-16)."""
+    def check_stylesheet(self, rendering_pages: list[Page], countries: set[str]) -> None:
+        """The hide and show rules at top level, grouped selectors accepted (D-2026-09-12-16);
+        each rendering page's <style> blocks count after style.css, and no rule may hide a country
+        block (D-2026-09-26-1).
+
+        Args:
+            rendering_pages: the pages the numbers table's `rendered_in` names that exist.
+            countries: the uppercase codes of the numbers table.
+        """
         stylesheet = self.root / "style.css"
         if not stylesheet.exists():
             self.report.result(
                 "numbers", "FAIL", "style.css missing while emergency-numbers.json exists"
             )
             return
-        css = self.read_css()
-        note_displays = []
-        target_displays = []
-        note_selector = f".{SUGGESTION_NOTE_CLASS}"
-        show_selectors = {
-            f".{COUNTRY_BLOCK_CLASS}:target .{SUGGESTION_NOTE_CLASS}",
-            f".{COUNTRY_BLOCK_CLASS}:target > .{SUGGESTION_NOTE_CLASS}",
-        }
-        for digits in re.findall(r"content\s*:[^;}]*?(\d{2,})", css, re.I):
+        sheet_rules = css_rules(self.read_css())
+        for digits in content_digit_runs(sheet_rules):
             self.report.result(
                 "numbers", "FAIL", f"style.css writes {digits} through a content: rule"
             )
-        for selector, body in top_level_css_rules(css):
-            displays = re.findall(r"display\s*:\s*([^;!]+)", body, re.I)
-            value = displays[-1].strip().lower() if displays else None
-            selectors = selector_list(selector)
-            if note_selector in selectors:
-                note_displays.append(value)
-            if selectors & show_selectors:
-                target_displays.append(value)
-        hides = bool(note_displays) and note_displays[-1] == "none"
-        shows = bool(target_displays) and target_displays[-1] not in (None, "none")
-        if hides and shows:
+        for page in self.pages.values():
+            for digits in content_digit_runs(page_style_rules(page)):
+                self.report.result(
+                    "numbers",
+                    "FAIL",
+                    f"{page.relative_path}: <style> writes {digits} through a content: rule",
+                )
+        if suggestion_rules_hold(sheet_rules):
             self.report.result(
                 "numbers",
                 "PASS",
@@ -831,6 +1156,23 @@ class Checker:
                 "style.css must hide .suggestion-note and show it under "
                 ".country:target .suggestion-note",
             )
+        for page in rendering_pages:
+            page_rules = sheet_rules + page_style_rules(page)
+            if page.style_blocks and not suggestion_rules_hold(page_rules):
+                self.report.result(
+                    "numbers",
+                    "FAIL",
+                    f"{page.relative_path}: its <style> blocks undo style.css: .suggestion-note "
+                    "must stay hidden and show under .country:target",
+                )
+            for rule in page_rules:
+                if hides_country_block(rule, countries):
+                    self.report.result(
+                        "numbers",
+                        "FAIL",
+                        f"{page.relative_path}: a rule hides country blocks: "
+                        f"{rule.resolved_selector}",
+                    )
 
 
 def main() -> int:
