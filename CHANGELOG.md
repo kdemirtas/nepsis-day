@@ -4,6 +4,7 @@
 > until a version is cut.
 
 ## Unreleased
+- PR #5: Phase 1a residue: check.py holds inline style blocks and hidden country blocks to the rules, reads CSS as CSS (D-2026-09-26-1) (2026-09-26, closes N4)
 - PR #4: Phase 1a: the check script, its test, the first copies and the manifest; architect decisions D-2026-09-12-7 to -20 (2026-09-12)
 - PR #3: Docs: Type webpage, the new init-project type (2026-09-12)
 - PR #2: Docs: the web/ type folder is registered at the personal root (2026-09-12)
