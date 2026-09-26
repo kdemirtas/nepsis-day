@@ -1,7 +1,9 @@
 # nepsis-day: status
 > Read `PROJECT.md` first (the spec). This file = where things stand and what to do next. Entries
-> older than the current wave are in `STATUS_ARCHIVE.md`. Last updated **2026-09-12**.
+> older than the current wave are in `STATUS_ARCHIVE.md`. Last updated **2026-09-26**.
 > **Current wave:** init (since 2026-09-12)
+
+> **PHASE 1a RESIDUE (2026-09-26). Shipped as PR #?.** `/orchestrate` ran HANDOVER NEXT item 4 unattended. `scripts/check.py` now reads inline `<style>` blocks like `style.css` (digit rule, hide and show rules read after the sheet), fails a country block hidden by `hidden`, `<template>`, a `style` attribute or any rule naming `.country` or `#<CC>` (`:is`, `:has` count, `:not` does not), and reads CSS as CSS: `;` ends `@import` and `@charset`, backslash escapes, `/*` inside strings, the `content` property only with escapes decoded. D-2026-09-26-1 records it; the ⏳ in ARCHITECTURE Invariants is closed. Proof: 11 tests, planted faults 93 to 115, each new check mutation-tested; `check.py` OK on the tree. `/reviewer`: pass 1 FIX FIRST (gate docstrings; two false PASSes in the selector reader, `:is(.country)` and `[data-note="a b"]`), pass 2 SHIP. Next ring of CSS gaps parked as BACKLOG 7 (trigger: Phase 1b, first real page).
 
 > **ARCHITECT AND PHASE 1a (2026-09-12, late night). Staged.** `/architect` (greenfield) settled the residue in three answers (D-2026-09-12-7 check script in Phase 1, -8 byte-identical copies with `content/MANIFEST.md`, -9 the emergency-number table authored here) and, on Kerem's ask, designed the country suggestion for `/withdrawal` as a Cloudflare redirect to `?c=<CC>#<CC>` plus CSS `:target`, no script, no server (D-10, restated as D-11). `/next-task` built Phase 1a: `scripts/check.py` (the proof), `tests/test_check.py` (10 tests, 93 planted faults), `content/` with the three copies at app commit `19a1857` and the manifest. Two `/reviewer` loops of three passes each; Kerem's rule for the session: the docs move first by decision, code follows the rows, so D-12 to D-20 record what each pass sharpened (manifest `rendered_in`, uppercase codes, explicit closing of every element, attribute and CSS digit rules, top-level stylesheet rules). The shared web template was aligned with D-8 (`claude-shared` PR #8). Residue of the last pass is NEXT item 4 in `HANDOVER.md`. Still ⏳: Cloudflare Pages project and DNS, the redirect rules, the email-list provider, Kerem's structure session, Turkish of the suggestion note.
 
@@ -15,12 +17,12 @@
 > `generic`); scope agreed with Kerem. ⏳ the GitHub repo, ⏳ the Cloudflare Pages project and DNS, ⏳ the email-list provider, ⏳ Kerem's structure session.
 
 ## TL;DR
-The proof exists, no page yet. `scripts/check.py` and its test are in; `content/` holds the three copies from the app at `19a1857` with their manifest. The site is four pages in two languages, hand-written, no scripts, served by Cloudflare Pages from a public repo. Phase 1b (stylesheet, `/`, `/privacy`, `404`) is next after a small residue pass on the checker; the withdrawal page waits on Kerem's review of the copied text; Turkish waits on the app's Turkish pass; the email list waits on a provider; the wider structure waits on Kerem's session.
+The proof exists, no page yet. `scripts/check.py` and its test are in; `content/` holds the three copies from the app at `19a1857` with their manifest. The site is four pages in two languages, hand-written, no scripts, served by Cloudflare Pages from a public repo. Phase 1b (stylesheet, `/`, `/privacy`, `404`) is next; the withdrawal page waits on Kerem's review of the copied text; Turkish waits on the app's Turkish pass; the email list waits on a provider; the wider structure waits on Kerem's session.
 
 ## Status at a glance
 | Phase | What | State | Deliverable |
 |-------|------|-------|-------------|
-| 1 | skeleton: repo, Pages, `/`, `/privacy`, stylesheet, DNS | 🟡 1a done (check, copies, manifest); 1b pages not built | `https://nepsis.day/`, `/privacy` |
+| 1 | skeleton: repo, Pages, `/`, `/privacy`, stylesheet, DNS | 🟡 1a done (check, copies, manifest, residue pass); 1b pages not built | `https://nepsis.day/`, `/privacy` |
 | 2 | `/withdrawal` in English, sourced | 🟡 defined, not built | `/withdrawal`, Kerem-reviewed |
 | 3 | Turkish mirror | ⏳ app's Turkish pass, Kerem's review | `/tr/*` |
 | 4 | email list | ⏳ provider | a form on `/` or `/list` |
@@ -29,11 +31,11 @@ The proof exists, no page yet. `scripts/check.py` and its test are in; `content/
 ## Current numbers
 - Pages: 0 built, 3 planned per language (`/`, `/withdrawal`, `/privacy`), plus `404`.
 - Languages: 2 (`en`, `tr`).
-- Dependencies: 0. Proof: 10 tests, 93 planted faults, `check.py` green on the tree.
+- Dependencies: 0. Proof: 11 tests, 115 planted faults, `check.py` green on the tree.
 - Sources copied: 3 files from `kdemirtas/nepsis` at `19a1857` (`PRIVACY.md`, `sources/withdrawal-en.json`, `sources/withdrawal-tr.json`), byte-identical, listed in `content/MANIFEST.md`.
 
 ## Next steps
-The ordered list is `HANDOVER.md` NEXT. In short: the Phase 1a residue pass on the checker (item 4), then Phase 1b (stylesheet and the four pages), ⏳ Kerem's Cloudflare Pages project and DNS, Phase 2 (`emergency-numbers.json`, `withdrawal.html`, `docs/cloudflare-rules.md`), ⏳ Kerem's redirect rules in the dashboard, ⏳ the structure session and the email-list provider.
+The ordered list is `HANDOVER.md` NEXT. In short: Phase 1b (stylesheet and the four pages), ⏳ Kerem's Cloudflare Pages project and DNS, Phase 2 (`emergency-numbers.json`, `withdrawal.html`, `docs/cloudflare-rules.md`), ⏳ Kerem's redirect rules in the dashboard, ⏳ the structure session and the email-list provider.
 
 ## How to run
     cd ~/code/personal/web/nepsis-day

@@ -996,6 +996,214 @@ FAULTS = [
         ),
         "javascript: URL",
     ),
+    (
+        "inline style block writes a number",
+        lambda site: site.write(
+            "withdrawal.html",
+            html_page(
+                "en",
+                "tr",
+                "/tr/withdrawal",
+                WITHDRAWAL_BODY + '<style>#TR .big::after { content: " (155)"; }</style>',
+            ),
+        ),
+        "withdrawal.html: <style> writes 155 through a content: rule",
+    ),
+    (
+        "inline style block undoes the hide rule",
+        lambda site: site.write(
+            "withdrawal.html",
+            html_page(
+                "en",
+                "tr",
+                "/tr/withdrawal",
+                WITHDRAWAL_BODY + "<style>.suggestion-note { display: block; }</style>",
+            ),
+        ),
+        "withdrawal.html: its <style> blocks undo style.css",
+    ),
+    (
+        "country block with the hidden attribute",
+        lambda site: site.write(
+            "withdrawal.html",
+            html_page(
+                "en",
+                "tr",
+                "/tr/withdrawal",
+                WITHDRAWAL_BODY.replace(
+                    '<section id="TR" class="country">', '<section id="TR" class="country" hidden>'
+                ),
+            ),
+        ),
+        "TR block is hidden from every reader: hidden attribute on <section>",
+    ),
+    (
+        "country block inside a template",
+        lambda site: site.write(
+            "withdrawal.html",
+            html_page(
+                "en",
+                "tr",
+                "/tr/withdrawal",
+                "<template>" + WITHDRAWAL_BODY + "</template>",
+            ),
+        ),
+        "TR block is hidden from every reader: inside <template>",
+    ),
+    (
+        "country block inside a hidden ancestor",
+        lambda site: site.write(
+            "withdrawal.html",
+            html_page(
+                "en",
+                "tr",
+                "/tr/withdrawal",
+                WITHDRAWAL_BODY.replace(
+                    '<section id="US"', '<div hidden="until-found"><section id="US"'
+                )
+                + "</div>",
+            ),
+        ),
+        "US block is hidden from every reader: hidden attribute on <div>",
+    ),
+    (
+        "country block hidden by its style attribute",
+        lambda site: site.write(
+            "withdrawal.html",
+            html_page(
+                "en",
+                "tr",
+                "/tr/withdrawal",
+                WITHDRAWAL_BODY.replace(
+                    '<section id="TR" class="country">',
+                    '<section id="TR" class="country" style="color: red; DISPLAY: None">',
+                ),
+            ),
+        ),
+        "TR block is hidden from every reader: style attribute on <section>",
+    ),
+    (
+        "rule hides every country but the target",
+        lambda site: site.write("style.css", STYLE + ".country:not(:target) { display: none; }"),
+        "withdrawal.html: a rule hides country blocks: .country:not(:target)",
+    ),
+    (
+        "rule hides country blocks until one is the target",
+        lambda site: site.write(
+            "style.css",
+            STYLE + ".country { display: none; }\n.country:target { display: block; }",
+        ),
+        "withdrawal.html: a rule hides country blocks: .country",
+    ),
+    (
+        "rule inside a media query hides country blocks",
+        lambda site: site.write(
+            "style.css",
+            STYLE + "@media (max-width: 600px) { main > section.country { visibility: hidden; } }",
+        ),
+        "withdrawal.html: a rule hides country blocks: main > section.country",
+    ),
+    (
+        "nested rule hides country blocks",
+        lambda site: site.write(
+            "style.css", STYLE + ".country { color: black; &:not(:target) { display: none; } }"
+        ),
+        "withdrawal.html: a rule hides country blocks: .country:not(:target)",
+    ),
+    (
+        "inline style block hides one country by id",
+        lambda site: site.write(
+            "tr/withdrawal.html",
+            html_page(
+                "tr", "en", "/withdrawal", WITHDRAWAL_BODY + "<style>#US { display: none; }</style>"
+            ),
+        ),
+        "tr/withdrawal.html: a rule hides country blocks: #US",
+    ),
+    (
+        "rule hides country blocks through is",
+        lambda site: site.write("style.css", STYLE + ":is(.country) { display: none; }"),
+        "withdrawal.html: a rule hides country blocks: :is(.country)",
+    ),
+    (
+        "rule hides the element that holds the country blocks",
+        lambda site: site.write("style.css", STYLE + "main:has(.country) { display: none; }"),
+        "withdrawal.html: a rule hides country blocks: main:has(.country)",
+    ),
+    (
+        "rule with a spaced attribute value hides country blocks",
+        lambda site: site.write(
+            "style.css", STYLE + '.country[data-note="a b"] { display: none; }'
+        ),
+        'withdrawal.html: a rule hides country blocks: .country[data-note="a b"]',
+    ),
+    (
+        "import statement before an override",
+        lambda site: site.write(
+            "style.css", STYLE + '@import "/print.css";\n.suggestion-note { display: block; }'
+        ),
+        "style.css must hide .suggestion-note",
+    ),
+    (
+        "escaped quote before an override",
+        lambda site: site.write(
+            "style.css",
+            STYLE + '.big::after { content: "\\"}"; }\n.suggestion-note { display: block; }',
+        ),
+        "style.css must hide .suggestion-note",
+    ),
+    (
+        "css escapes write a number",
+        lambda site: site.write(
+            "style.css", STYLE + '#TR .big::after { content: "\\31\\35 \\35"; }'
+        ),
+        "style.css writes 155 through a content: rule",
+    ),
+    (
+        "css strings joined write a number",
+        lambda site: site.write("style.css", STYLE + '#TR .big::after { content: "1" "55"; }'),
+        "style.css writes 155 through a content: rule",
+    ),
+    (
+        "numbers row names a page that does not exist",
+        lambda site: site.write(
+            "content/MANIFEST.md",
+            site.manifest().replace(
+                "| `content/emergency-numbers.json` | 2026-09-12 "
+                "| `withdrawal.html tr/withdrawal.html` |",
+                "| `content/emergency-numbers.json` | 2026-09-12 "
+                "| `withdrawal.html tr/withdrawl.html` |",
+            ),
+        ),
+        "FAIL numbers   rendered_in names tr/withdrawl.html, which does not exist",
+    ),
+    (
+        "comment with an apostrophe before an override",
+        lambda site: site.write(
+            "style.css", STYLE + "/* don't show it */\n.suggestion-note { display: block; }"
+        ),
+        "style.css must hide .suggestion-note",
+    ),
+    (
+        "comment markers inside strings around an override",
+        lambda site: site.write(
+            "style.css",
+            STYLE + '.a::after { content: "/*"; }\n.suggestion-note { display: block; }\n'
+            '.b::after { content: "*/"; }',
+        ),
+        "style.css must hide .suggestion-note",
+    ),
+    (
+        "comment markers inside strings around a foreign fetch",
+        lambda site: site.write(
+            "style.css",
+            STYLE
+            + '.a::after { content: "/*"; }\n'
+            "body { background: url(https://cdn.example/x.png); }\n"
+            '.b::after { content: "*/"; }',
+        ),
+        "style.css: fetches outside the allowlist: https://cdn.example/x.png",
+    ),
 ]
 
 
@@ -1137,6 +1345,34 @@ class CheckTest(unittest.TestCase):
             "`withdrawal.html tr/withdrawal.html`", "`withdrawal.html` `tr/withdrawal.html`"
         )
         self.site.write("content/MANIFEST.md", manifest)
+        exit_code, output = self.site.run()
+        self.assertEqual(exit_code, 0, output)
+
+    def test_css_variants_pass(self):
+        self.site.write(
+            "style.css",
+            '@charset "utf-8";\n'
+            "/* the note: don't show it until the redirect targets its block */\n"
+            + STYLE
+            + ".content:hover { color: #112233; }\n"
+            '.quote::before { content: "\\201C"; }\n'
+            ".country:target { outline: 2px solid; }\n"
+            ".site-nav:not(.country) { display: none; }\n"
+            ".x:not(:is(.country, #TR)) { visibility: hidden; }\n"
+            ".country { color: black; & h2 { margin: 0; } }\n"
+            "@media print { .site-nav { display: none; } }\n",
+        )
+        self.site.write(
+            "withdrawal.html",
+            html_page(
+                "en",
+                "tr",
+                "/tr/withdrawal",
+                '<p hidden>x</p><template><p>y</p></template>'
+                + WITHDRAWAL_BODY
+                + "<style>.big { font-size: 2rem; }</style>",
+            ),
+        )
         exit_code, output = self.site.run()
         self.assertEqual(exit_code, 0, output)
 
