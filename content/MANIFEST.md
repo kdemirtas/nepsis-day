@@ -10,6 +10,6 @@ is authored here (D-2026-09-12-9). Local checkouts: `kdemirtas/nepsis` at
 
 | file | repo | commit | path | copied_on | rendered_in |
 |---|---|---|---|---|---|
-| `PRIVACY.md` | `kdemirtas/nepsis` | `19a1857a212c3b4707b9f806e9e424c3f1c810cc` | `PRIVACY.md` | 2026-09-12 | - |
+| `PRIVACY.md` | `kdemirtas/nepsis` | `19a1857a212c3b4707b9f806e9e424c3f1c810cc` | `PRIVACY.md` | 2026-09-12 | `privacy.html` |
 | `withdrawal-en.json` | `kdemirtas/nepsis` | `19a1857a212c3b4707b9f806e9e424c3f1c810cc` | `sources/withdrawal-en.json` | 2026-09-12 | - |
 | `withdrawal-tr.json` | `kdemirtas/nepsis` | `19a1857a212c3b4707b9f806e9e424c3f1c810cc` | `sources/withdrawal-tr.json` | 2026-09-12 | - |

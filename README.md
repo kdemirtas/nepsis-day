@@ -19,4 +19,7 @@ The public face of Nepsis (the recovery companion app, private repo `kdemirtas/n
     python3 -m http.server 8080        # from the repo root, then http://localhost:8080/
     python3 scripts/check.py           # the proof: pages parse, no <script>, copies match content/MANIFEST.md, twins resolve
     python3 -m unittest discover tests # the proof's own test: every fault it must catch, planted and caught
+    PATH=~/.local/node/bin:$PATH CHROME_PATH=/opt/google/chrome/chrome npx --yes lighthouse@12 \
+        http://localhost:8080/index.html --only-categories=accessibility,best-practices --view
+                                       # Lighthouse, per changed page, while the preview runs; 100 and 100 is the bar
     GH_TOKEN=$(gh auth token --user kdemirtas) git push   # Cloudflare Pages deploys main, no build step
