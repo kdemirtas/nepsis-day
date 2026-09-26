@@ -1,0 +1,153 @@
+/* Plain and warm, from the app's DESIGN.md Visual direction (dp read as px).
+   Text colours are the tokens darkened to a 4.5:1 contrast on the ground; the coral and the
+   muted grey of the tokens stay for borders and marks only (D-2026-09-26-2). */
+
+:root {
+  --ground: #fbf3ea;
+  --card: #ffffff;
+  --border: #eadfd2;
+  --ink: #2f2a26;
+  --muted-text: #6b6159;
+  --accent: #e2725b;
+  --accent-soft: #fbe2da;
+  --accent-text: #a8432f;
+  --corner-card: 22px;
+  --display-font: Manrope, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --body-font: Nunito, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body-font);
+  font-size: 100%;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display-font);
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 0 0 0.5em;
+}
+
+h1 {
+  font-size: 2.25rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+}
+
+h3 {
+  font-size: 1.125rem;
+  margin-top: 1.5rem;
+}
+
+p,
+ul {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--accent-text);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+a:focus-visible {
+  outline: 3px solid var(--accent-text);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.page {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.site-header {
+  padding: 1.5rem 0 0.5rem;
+  border-bottom: 3px solid var(--accent);
+  margin-bottom: 2rem;
+}
+
+.wordmark {
+  font-family: var(--display-font);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.tagline {
+  color: var(--muted-text);
+  font-size: 1.125rem;
+}
+
+.promises {
+  list-style: decimal outside;
+  padding-left: 1.75rem;
+}
+
+.promise::marker {
+  font-family: var(--display-font);
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.promise {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--accent);
+  border-radius: var(--corner-card);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.promise h3 {
+  margin-top: 0;
+}
+
+.promise p {
+  margin-bottom: 0;
+}
+
+.adjunct-note {
+  background: var(--accent-soft);
+  border-radius: var(--corner-card);
+  padding: 1rem 1.25rem;
+  font-weight: 700;
+}
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  padding: 1.5rem 0 2rem;
+  color: var(--muted-text);
+  font-size: 0.9375rem;
+}
+
+.site-footer p {
+  margin-bottom: 0.5rem;
+}
+
+.policy-date {
+  color: var(--muted-text);
+}

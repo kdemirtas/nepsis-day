@@ -47,7 +47,7 @@ Turkish pages live under `/tr/` with the same paths.
 ## Phases
 | Phase | What | State |
 |---|---|---|
-| 1 | skeleton: repo, Pages, `/` and `/privacy` in English, stylesheet, domain wired | 🟡 defined, not built |
+| 1 | skeleton: repo, Pages, `/` and `/privacy` in English, stylesheet, domain wired | 🟡 pages built in English; Pages project and DNS ⏳ |
 | 2 | `/withdrawal` in English, sourced, reviewed by Kerem | 🟡 defined, not built |
 | 3 | Turkish mirror of every page | ⏳ awaiting the app's Turkish pass and Kerem's review |
 | 4 | email list | ⏳ awaiting the provider decision |

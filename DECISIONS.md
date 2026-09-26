@@ -5,6 +5,7 @@
 
 | Id | Decided | What | Replaces |
 |---|---|---|---|
+| D-2026-09-26-2 | 2026-09-26 | Text on the site uses the Plain and warm tokens darkened to 4.5:1 (links `#A8432F`, secondary text `#6B6159`); coral and muted grey stay for borders and marks | none |
 | D-2026-09-26-1 | 2026-09-26 | A country block may not be hidden by an attribute, a `<template>` or any rule; a page's `<style>` blocks are held to the stylesheet rules; the check reads CSS as CSS: statements, escapes, comments inside strings, the `content` property only | none |
 | D-2026-09-12-20 | 2026-09-12 | The number rule reads every non-structural attribute and forbids digits in CSS `content:`; a block without a row and a page with blocks outside `rendered_in` fail; the pick link stays on the page's own path | none |
 | D-2026-09-12-19 | 2026-09-12 | `alt` joins the attributes the country-block number rule reads | none |
@@ -26,6 +27,12 @@
 | D-2026-09-12-3 | 2026-09-12 | Own public repo `kdemirtas/nepsis-day` at `~/code/personal/web/nepsis-day/` | none |
 | D-2026-09-12-2 | 2026-09-12 | Type `generic` for the site, not `mobile-app` | none |
 | D-2026-09-12-1 | 2026-09-12 | Project initialised under this doc set | none |
+
+## D-2026-09-26-2: text colours darkened to 4.5:1, the tokens kept for marks
+**What.** `style.css` takes every colour from the app's `DESIGN.md` Visual direction, except text: coral `#E2725B` reads 2.81:1 and muted `#8A7F76` 3.55:1 on the ground `#FBF3EA`, under the 4.5:1 WCAG AA asks of body text. Links use `#A8432F` (5.45:1), secondary text `#6B6159` (5.49:1). Coral stays for the header rule and the promise borders, where no text sits on it.
+**Evidence.** Contrast computed in the Phase 1b session, 2026-09-26; `PROJECT.md` "What done means" sets Lighthouse accessibility 100 as Kerem's bar for a page a shaking hand has to read. Made unattended while building Phase 1b; Kerem approved the home page text, not the colours.
+**Replaces.** Nothing; the app's tokens are unchanged.
+**Cited by.** `style.css` header comment.
 
 ## D-2026-09-26-1: nothing hides a country block, and the check reads CSS as CSS
 **What.** A country block is rendered for every reader: it fails if it or an ancestor carries `hidden` (any value), sits inside `<template>`, or has a `style` attribute whose last `display` is `none` or `visibility` is `hidden` or `collapse`; and it fails if any rule, in `style.css` or in a page `<style>` block, at top level, inside an at-rule or nested, has a subject compound naming `.country` or `#<CC>` and hides the same way. The subject compound is the last one, split only outside parentheses, brackets and strings; the arguments of `:is()`, `:where()` and `:has()` count (`main:has(.country)` hides the blocks inside it), those of `:not()` do not. `:target` does not excuse the rule: `.country:not(:target)` hides every block but the suggested one, `.country:target` would hide the suggested one. A rendering page's `<style>` blocks are read after `style.css`, the worst case for an override, and the two rules of D-2026-09-12-16 must still hold. The `content:` digit rule covers `<style>` blocks, reads the `content` property only (not a selector such as `.content:hover`), joins its strings and decodes CSS escapes (`\31\35\35` writes 155; `\201C` writes a quote, no digits). The stylesheet reader ends a top-level statement such as `@import` or `@charset` at its `;`, honours backslash escapes inside and outside strings, and treats `/*` inside a string as text.
